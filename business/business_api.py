@@ -1,67 +1,51 @@
-from database.models import Transaction, ServiceCategory, Service
-from database import get_db
-
+from main import app
+from database import register_business_category_db, register_business_db, \
+    get_business_categories_db, get_exact_business_db, \
+    pay_for_service_db, delete_business_db
 
 # Регистрация категории бизнеса
-def register_business_category_db(name: str):
-    db = next(get_db())
-    new_category = ServiceCategory(name=name)
-    db.add(new_category)
-    db.commit()
+@app.post('/register-business-category')
+async def register_business_category_api(name: str):
+    result = register_business_category_db(name=name)
 
-    return "Категория бизнеса успешно зарегистрирована"
+    return {"status": 1, "message": result}
 
 # Регистрация бизнеса
-def register_business_db(category_id: int, name: str, card_number: int):
-    db = next(get_db())
-    new_business = Service(category_id=category_id,
-                           name=name,
-                           card_number=card_number)
-    db.add(new_business)
-    db.commit()
+@app.post('/register-business')
+async def register_business_api(category_id: int, name: str, card_number: int):
+    result = register_business_db(category_id=category_id,
+                                  name=name,
+                                  card_number=card_number)
 
-    return "Бизнес успешно зарегистрирован"
+    return {"status": 1, "message": result}
 
 # Вывод всех категорий
-def get_business_categories_db(exact_category_id: int = 0):
-    db = next(get_db())
-    if exact_category_id == 0:
-        categories = db.query(ServiceCategory).all()
-    else:
-        categories = db.query(ServiceCategory).filter_by(id=exact_category_id).all()
+@app.get('/get-all-categories')
+async def get_business_categories_api(exact_category_id: int = 0):
+    categories = get_business_categories_db(exact_category_id=exact_category_id)
 
-    return categories
+    return {"status": 1, "categories": categories}
 
 # Вывод услуг
-def get_exact_business_db(business_id: int, category_id: int):
-    db = next(get_db())
-    business = db.query(Service).filter_by(id=business_id,
-                                           category_id=category_id).first()
+@app.get('/get-business')
+async def get_exact_business_api(business_id: int, category_id: int):
+    business = get_exact_business_db(business_id=business_id,
+                                     category_id=category_id)
 
-    if business:
-        return business
-    else:
-        return "Бизнес не найден"
+    return {"status": 1, "business": business}
 
 # Оплата услуги
-def pay_for_service_db(business_id: int, from_card: int, amount: float):
-    db = next(get_db())
-    transaction = Transaction(business_id=business_id,
-                              card_id=from_card,
-                              amount=amount)
-    db.add(transaction)
-    db.commit()
+@app.post('/pay-service')
+async def pay_for_service_api(business_id: int, from_card: int, amount: float):
+    result = pay_for_service_db(business_id=business_id,
+                                from_card=from_card,
+                                amount=amount)
 
-    return "Услуга успешно оплачена"
+    return {"status": 1, "message": result}
 
 # Удалить бизнес
-def delete_business_db(business_id: int):
-    db = next(get_db())
-    business = db.query(Service).filter_by(id=business_id).first()
+@app.delete('/delete-business')
+async def delete_business_api(business_id: int):
+    result = delete_business_db(business_id=business_id)
 
-    if business:
-        db.delete(business)
-        db.commit()
-        return "Бизнес успешно удален"
-    else:
-        return "Бизнес не найден"
+    return {"status": 1, "message": result}
