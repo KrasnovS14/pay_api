@@ -1,12 +1,12 @@
 from main import app
 
 
-# Регистарция категорий бизнеса
+# Регистрация категорий бизнеса
 @app.post('/register-business-category')
 async  def register_business_category_api(name: str):
     pass
 
-# Регистарция бизнеса
+# Регистрация бизнеса
 @app.post('/register-business')
 async  def register_business_api(category_id: int, name: str, card_number: int):
     pass

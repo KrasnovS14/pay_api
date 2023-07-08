@@ -31,5 +31,5 @@ async def get_exact_of_all_cards(user_id: int, card: int = 0):
 
 # Вывод истории карту
 @app.get('/get-cards-monitoring')
-async def get_exact_of_all_cards_monitoring(card: int = 0):
+async def get_exact_of_all_cards_monitoring(user_id: int, card: int = 0,):
     pass
